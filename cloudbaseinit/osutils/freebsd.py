@@ -22,7 +22,9 @@ class FreeBSDUtils(base.BaseOSUtils):
 
     def set_host_name(self, new_host_name):
         try:
-            subprocess.checkoutput(["hostname", new_host_name])
+            subprocess.check_output(["hostname", new_host_name])
+            cmd_newhost = "[ -z `egrep '^hostname' /etc/rc.conf` ] && { echo 'hostname=\"%s\"' >> /etc/rc.conf } || { sed -e 's/^hostname=.*$/hostname=\"%s\"/' -I '' /etc/rc.conf }" % (new_host_name, new_host_name)
+            subprocess.check_output( cmd_newhost, shell=True)
         except CalledProcessError:
             raise Exception(CalledProcessError.output)
 
