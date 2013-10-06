@@ -66,7 +66,7 @@ class FreeBSDUtils(base.BaseOSUtils):
         """
         interface = subprocess.check_output("route get default | grep interface", shell=True).split()[1]
         gateway_ip = subprocess.check_output("route get default | grep gateway", shell=True).split()[1]
-        return (interface, gateway_ip
+        return (interface, gateway_ip)
 
     def check_static_route_exists(self, destination):
         pass
