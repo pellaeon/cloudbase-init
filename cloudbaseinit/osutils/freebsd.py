@@ -15,10 +15,19 @@ class FreeBSDUtils(base.BaseOSUtils):
         subprocess.check_output(adduser_cmd, shell=True)
 
     def set_host_name(self, new_host_name):
+<<<<<<< HEAD
         # subprocess.check_output(["hostname", new_host_name]) # is it no use ?
         # using SED
         cmd_newhost = "[ -z `egrep '^hostname' /etc/rc.conf` ] && { echo 'hostname=\"%s\"' >> /etc/rc.conf } || { sed -e 's/^hostname=.*$/hostname=\"%s\"/' -I '' /etc/rc.conf }" % (new_host_name, new_host_name)
         subprocess.check_output(cmd_newhost, shell=True)
+=======
+        try:
+            subprocess.check_output(["hostname", new_host_name])
+            cmd_newhost = "[ -z `egrep '^hostname' /etc/rc.conf` ] && { echo 'hostname=\"%s\"' >> /etc/rc.conf } || { sed -e 's/^hostname=.*$/hostname=\"%s\"/' -I '' /etc/rc.conf }" % (new_host_name, new_host_name)
+            subprocess.check_output(cmd_newhost, shell=True)
+        except CalledProcessError:
+            raise Exception(CalledProcessError.output)
+>>>>>>> 7f164bd810b3c30106a30458688b648d3222202b
 
     def sanitize_shell_input(self, value):
         pass
@@ -53,7 +62,12 @@ class FreeBSDUtils(base.BaseOSUtils):
         pass
 
     def get_default_gateway(self):
-        pass
+        """
+            We cannot handle mutiple default gateway.
+        """
+        interface = subprocess.check_output("route get default | grep interface", shell=True).split()[1]
+        gateway_ip = subprocess.check_output("route get default | grep gateway", shell=True).split()[1]
+        return (interface, gateway_ip)
 
     def check_static_route_exists(self, destination):
         pass
