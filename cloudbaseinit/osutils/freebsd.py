@@ -24,7 +24,7 @@ class FreeBSDUtils(base.BaseOSUtils):
         try:
             subprocess.check_output(["hostname", new_host_name])
             cmd_newhost = "[ -z `egrep '^hostname' /etc/rc.conf` ] && { echo 'hostname=\"%s\"' >> /etc/rc.conf } || { sed -e 's/^hostname=.*$/hostname=\"%s\"/' -I '' /etc/rc.conf }" % (new_host_name, new_host_name)
-            subprocess.check_output( cmd_newhost, shell=True)
+            subprocess.check_output(cmd_newhost, shell=True)
         except CalledProcessError:
             raise Exception(CalledProcessError.output)
 
@@ -61,7 +61,12 @@ class FreeBSDUtils(base.BaseOSUtils):
         pass
 
     def get_default_gateway(self):
-        pass
+        """
+            We cannot handle mutiple default gateway.
+        """
+        interface = subprocess.check_output("route get default | grep interface", shell=True).split()[1]
+        gateway_ip = subprocess.check_output("route get default | grep gateway", shell=True).split()[1]
+        return (interface, gateway_ip
 
     def check_static_route_exists(self, destination):
         pass
