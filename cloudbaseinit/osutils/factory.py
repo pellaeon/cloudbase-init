@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
+import sys
 
 from cloudbaseinit.utils import classloader
 
@@ -22,9 +22,10 @@ from cloudbaseinit.utils import classloader
 class OSUtilsFactory(object):
     def get_os_utils(self):
         osutils_class_paths = {
-            'nt': 'cloudbaseinit.osutils.windows.WindowsUtils',
-            'posix': 'cloudbaseinit.osutils.posix.PosixUtils'
+            'windows': 'cloudbaseinit.osutils.windows.WindowsUtils', # not sure about windows yet
+            'posix': 'cloudbaseinit.osutils.posix.PosixUtils',
+	    'freebsd9': 'cloudbaseinit,osutils.freebsd.FreeBSDUtils'
         }
 
         cl = classloader.ClassLoader()
-        return cl.load_class(osutils_class_paths[os.name])()
+        return cl.load_class(osutils_class_paths[sys.platform])()
