@@ -3,30 +3,22 @@ import subprocess
 
 class FreeBSDUtils(base.BaseOSUtils):
     def reboot(self):
-        if ( os.system('reboot') != 0 ):
-            raise Exception('Reboot failed')
+        subprocess.check_output('reboot', shell=True)
 
     def user_exists(self, username):
-        try:
-            subprocess.check_output(["id", username])
-        except CalledProcessError:
-            return False
-        return True
+        from pwd import getpwall
+        return any(p.pw_name==usename for p in getpwall())
 
     # not completed
     def create_user(self, username, password, password_expires=False):
-        try:
-            subprocess.check_output(["adduser", "-w", "yes", "-s", "tcsh"])
-        except CalledProcessError:
-            raise Exception(CalledProcessError.output)
+        adduser_cmd = "adduser -w yes -s tcsh" # it should be completed someday
+        subprocess.check_output(adduser_cmd, shell=True)
 
     def set_host_name(self, new_host_name):
-        try:
-            subprocess.check_output(["hostname", new_host_name])
-            cmd_newhost = "[ -z `egrep '^hostname' /etc/rc.conf` ] && { echo 'hostname=\"%s\"' >> /etc/rc.conf } || { sed -e 's/^hostname=.*$/hostname=\"%s\"/' -I '' /etc/rc.conf }" % (new_host_name, new_host_name)
-            subprocess.check_output( cmd_newhost, shell=True)
-        except CalledProcessError:
-            raise Exception(CalledProcessError.output)
+        # subprocess.check_output(["hostname", new_host_name]) # is it no use ?
+        # using SED
+        cmd_newhost = "[ -z `egrep '^hostname' /etc/rc.conf` ] && { echo 'hostname=\"%s\"' >> /etc/rc.conf } || { sed -e 's/^hostname=.*$/hostname=\"%s\"/' -I '' /etc/rc.conf }" % (new_host_name, new_host_name)
+        subprocess.check_output(cmd_newhost, shell=True)
 
     def sanitize_shell_input(self, value):
         pass
